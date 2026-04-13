@@ -15,6 +15,7 @@ if not api_key:
     sys.exit(1)
 
 client = genai.Client(api_key=api_key)
+chat = client.chats.create(model=model or "gemini-flash-lite-latest")
 
 while True:
     user_prompt = input("Enter your prompt (/exit to quit): ")
@@ -23,7 +24,5 @@ while True:
         print("Exiting the program.")
         sys.exit(0)
 
-    response = client.models.generate_content(
-        model=model or "gemini-flash-lite-latest", contents=user_prompt
-    )
+    response = chat.send_message(user_prompt)
     print(response.text)
