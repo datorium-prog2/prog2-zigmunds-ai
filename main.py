@@ -16,7 +16,14 @@ if not api_key:
 
 client = genai.Client(api_key=api_key)
 
-response = client.models.generate_content(
-    model=model or "gemini-flash-lite-latest", contents="Čau! Kā tev iet?"
-)
-print(response.text)
+while True:
+    user_prompt = input("Enter your prompt (/exit to quit): ")
+
+    if user_prompt.startswith("/exit"):
+        print("Exiting the program.")
+        sys.exit(0)
+
+    response = client.models.generate_content(
+        model=model or "gemini-flash-lite-latest", contents=user_prompt
+    )
+    print(response.text)
