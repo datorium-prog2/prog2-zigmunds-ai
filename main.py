@@ -49,6 +49,8 @@ config = types.GenerateContentConfig(
 
 client = genai.Client(api_key=api_key)
 
+history = []
+
 while True:
     user_prompt = input("Enter your prompt (/exit to quit): ")
 
@@ -56,8 +58,13 @@ while True:
         print("Exiting the program.")
         sys.exit(0)
 
+    user_message = types.Content(
+        role="user", parts=[types.Part.from_text(text=user_prompt)]
+    )
+    history.append(user_message)
+
     response = client.models.generate_content(
-        model=model or "gemini-flash-lite-latest", contents=user_prompt, config=config
+        model=model or "gemini-flash-lite-latest", contents=history, config=config
     )
 
     if response.candidates[0].content.parts[0].function_call:  # type: ignore
