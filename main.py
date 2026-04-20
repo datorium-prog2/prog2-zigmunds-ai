@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 from google import genai
@@ -8,6 +9,31 @@ from google.genai import types
 
 def get_weather(city):
     return {"city": city, "temperature": 17}
+
+
+def list_directory_files(path):
+    # dabūjam direktoriju, no kuras tiek palaists aģents
+    workplace_root = Path.cwd().resolve()
+    # mēginam dabūt īstās direktorijas ceļu
+    candidate = (workplace_root / path).resolve()
+
+    # aģents spēs nolasīt tikai to direktoriju, kas ir iekšā aģenta direktorijā
+    if workplace_root not in [candidate, *candidate.parents]:
+        return f"Path escapes the worplace root: {path}"
+
+    if not candidate.exists():
+        return f"Path does not exist: {path}"
+
+    if not candidate.is_dir():
+        return f"Not a directory: {path}"
+
+    entries = []
+    for item in candidate.iterdir():
+        kind = "dir" if item.is_dir() else "file"
+        relative = item.relative_to(workplace_root)
+        entries.append(f"{kind}: {relative}")
+
+    return "\n".join(entries) if entries else "empty directory."
 
 
 load_dotenv()
@@ -27,7 +53,7 @@ system_instruction = """
         You reply ONLY Latvian.
         """
 
-tools = types.Tool(
+get_weather_tool = types.Tool(
     function_declarations=[
         types.FunctionDeclaration(
             name="get_weather",
@@ -41,11 +67,29 @@ tools = types.Tool(
     ]
 )
 
-TOOL_REGISTRY = {"get_weather": get_weather}
-
-config = types.GenerateContentConfig(
-    system_instruction=system_instruction, tools=[tools]
+list_directory_files_tool = types.Tool(
+    function_declarations=[
+        types.FunctionDeclaration(
+            name="list_directory_files",
+            description="Fetches list of items in path (must be in current workplace directory)",
+            parameters=types.Schema(
+                type=types.Type.OBJECT,
+                properties={"path": types.Schema(type=types.Type.STRING)},
+                required=["path"],
+            ),
+        )
+    ]
 )
+
+
+TOOLS = [get_weather_tool, list_directory_files_tool]
+
+TOOL_REGISTRY = {
+    "get_weather": get_weather,
+    "list_directory_files": list_directory_files,
+}
+
+config = types.GenerateContentConfig(system_instruction=system_instruction, tools=TOOLS)
 
 client = genai.Client(api_key=api_key)
 
