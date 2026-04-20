@@ -9,6 +9,7 @@ from google.genai import types
 def get_weather(city):
     return {"city": city, "temperature": 17}
 
+
 load_dotenv()
 # .env failā your_api_key_here vietā jābūt jūsu GEMINI API atslēgai
 
@@ -47,7 +48,6 @@ config = types.GenerateContentConfig(
 )
 
 client = genai.Client(api_key=api_key)
-# chat = client.chats.create(model=model or "gemini-flash-lite-latest", config=config)
 
 while True:
     user_prompt = input("Enter your prompt (/exit to quit): ")
