@@ -45,6 +45,8 @@ tools = types.Tool(
     ]
 )
 
+TOOL_REGISTRY = {"get_weather": get_weather}
+
 config = types.GenerateContentConfig(
     system_instruction=system_instruction, tools=[tools]
 )
@@ -67,5 +69,7 @@ while True:
         function_call = response.candidates[0].content.parts[0].function_call  # type: ignore
         print(f"Function call: {function_call.name}")
         print(f"Arguments: {function_call.args}")
+        result = TOOL_REGISTRY[function_call.name](**function_call.args)  # type: ignore
+        print(result)
     else:
         print(response.text)
