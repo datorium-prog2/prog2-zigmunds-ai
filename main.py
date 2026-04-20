@@ -9,11 +9,6 @@ from google.genai import types
 def get_weather(city):
     return {"city": city, "temperature": 17}
 
-
-def read_file():
-    pass
-
-
 load_dotenv()
 # .env failā your_api_key_here vietā jābūt jūsu GEMINI API atslēgai
 
