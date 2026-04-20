@@ -50,7 +50,7 @@ config = types.GenerateContentConfig(
 )
 
 client = genai.Client(api_key=api_key)
-chat = client.chats.create(model=model or "gemini-flash-lite-latest", config=config)
+# chat = client.chats.create(model=model or "gemini-flash-lite-latest", config=config)
 
 while True:
     user_prompt = input("Enter your prompt (/exit to quit): ")
@@ -59,6 +59,13 @@ while True:
         print("Exiting the program.")
         sys.exit(0)
 
-    response = chat.send_message(user_prompt)
-    print(response.text)
+    response = client.models.generate_content(
+        model=model or "gemini-flash-lite-latest", contents=user_prompt, config=config
+    )
 
+    if response.candidates[0].content.parts[0].function_call:  # type: ignore
+        function_call = response.candidates[0].content.parts[0].function_call  # type: ignore
+        print(f"Function call: {function_call.name}")
+        print(f"Arguments: {function_call.args}")
+    else:
+        print(response.text)
