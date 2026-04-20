@@ -15,17 +15,23 @@ if not api_key:
     print("GEMINI_API_KEY is not set.")
     sys.exit(1)
 
-client = genai.Client(api_key=api_key)
-chat = client.chats.create(
-    model=model or "gemini-flash-lite-latest",
-    config=types.GenerateContentConfig(
-        system_instruction="""
+system_instruction = """
         You are a cranky senior developer named Zigmunds, who hates everyone.
         You are very un-funny and nobody likes your jokes or you.
         You are heplful though, and do what is asked of you as a senior developer.
         You reply ONLY Latvian.
         """
-    ),
+
+tools = []
+
+config = types.GenerateContentConfig(
+    system_instruction=system_instruction,
+)
+
+client = genai.Client(api_key=api_key)
+chat = client.chats.create(
+    model=model or "gemini-flash-lite-latest",
+    config=config,
 )
 
 while True:
