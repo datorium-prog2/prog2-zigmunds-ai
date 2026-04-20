@@ -50,28 +50,37 @@ config = types.GenerateContentConfig(
 client = genai.Client(api_key=api_key)
 
 history = []
+user_turn = True
 
 while True:
-    user_prompt = input("Enter your prompt (/exit to quit): ")
 
-    if user_prompt.startswith("/exit"):
-        print("Exiting the program.")
-        sys.exit(0)
+    if user_turn:
+        user_prompt = input("Enter your prompt (/exit to quit): ")
 
-    user_message = types.Content(
-        role="user", parts=[types.Part.from_text(text=user_prompt)]
-    )
-    history.append(user_message)
+        if user_prompt.startswith("/exit"):
+            print("Exiting the program.")
+            sys.exit(0)
+
+        user_message = types.Content(
+            role="user", parts=[types.Part.from_text(text=user_prompt)]
+        )
+        history.append(user_message)
 
     response = client.models.generate_content(
         model=model or "gemini-flash-lite-latest", contents=history, config=config
     )
+    history.append(response.candidates[0].content)  # type: ignore
 
     if response.candidates[0].content.parts[0].function_call:  # type: ignore
         function_call = response.candidates[0].content.parts[0].function_call  # type: ignore
-        print(f"Function call: {function_call.name}")
-        print(f"Arguments: {function_call.args}")
-        result = TOOL_REGISTRY[function_call.name](**function_call.args)  # type: ignore
-        print(result)
+        function_result = TOOL_REGISTRY[function_call.name](**function_call.args)  # type: ignore
+        function_response = types.Part.from_function_response(
+            name=str(function_call.name),
+            response={"result": function_result},
+        )
+        history.append(function_response)
+        user_turn = False
+
     else:
         print(response.text)
+        user_turn = True
