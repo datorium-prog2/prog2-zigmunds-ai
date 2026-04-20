@@ -31,17 +31,26 @@ system_instruction = """
         You reply ONLY Latvian.
         """
 
-tools = []
+tools = types.Tool(
+    function_declarations=[
+        types.FunctionDeclaration(
+            name="get_weather",
+            description="Fetches weather data for a city",
+            parameters=types.Schema(
+                type=types.Type.OBJECT,
+                properties={"city": types.Schema(type=types.Type.STRING)},
+                required=["city"],
+            ),
+        )
+    ]
+)
 
 config = types.GenerateContentConfig(
-    system_instruction=system_instruction,
+    system_instruction=system_instruction, tools=[tools]
 )
 
 client = genai.Client(api_key=api_key)
-chat = client.chats.create(
-    model=model or "gemini-flash-lite-latest",
-    config=config,
-)
+chat = client.chats.create(model=model or "gemini-flash-lite-latest", config=config)
 
 while True:
     user_prompt = input("Enter your prompt (/exit to quit): ")
@@ -52,3 +61,4 @@ while True:
 
     response = chat.send_message(user_prompt)
     print(response.text)
+
