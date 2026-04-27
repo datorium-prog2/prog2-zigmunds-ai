@@ -1,6 +1,7 @@
 from google import genai
 from google.genai import types
-from registry import TOOL_REGISTRY, TOOLS
+
+from zigmunds_ai.registry import TOOL_REGISTRY, TOOLS
 
 
 class AgentSession:
@@ -37,7 +38,7 @@ class AgentSession:
             self._read_user_message()
 
         response = self._get_model_response()
-        self.history.append(response)
+        self._add_model_response(response)
 
         function_call = self._get_function_call(response)
         if function_call:
@@ -77,3 +78,6 @@ class AgentSession:
             response={"result": function_result},
         )
         self.history.append(function_response)
+
+    def _add_model_response(self, response):
+        self.history.append(response.candidates[0].content)
