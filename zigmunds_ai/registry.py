@@ -12,7 +12,6 @@ _list_directory_files_tool = types.Tool(
             parameters=types.Schema(
                 type=types.Type.OBJECT,
                 properties={"path": types.Schema(type=types.Type.STRING)},
-                required=["path"],
             ),
         )
     ]

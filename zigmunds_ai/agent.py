@@ -44,9 +44,10 @@ class AgentSession:
         if function_call:
             self._handle_function_call(function_call)
             self.user_turn = False
-        else:
-            print(response.text)
-            self.user_turn = True
+            return
+
+        print(response.text)
+        self.user_turn = True
 
     def _read_user_message(self):
         user_prompt = input("Enter your message: ")

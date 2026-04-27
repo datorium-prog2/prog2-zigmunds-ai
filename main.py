@@ -2,6 +2,7 @@ import os
 import sys
 
 from dotenv import load_dotenv
+from google.genai import errors
 
 from zigmunds_ai.agent import AgentSession
 
@@ -14,5 +15,9 @@ if not api_key:
     print("GEMINI_API_KEY is not set.")
     sys.exit(1)
 
-agent_session = AgentSession(api_key, model)
-agent_session.run()
+try:
+    agent_session = AgentSession(api_key, model)
+    agent_session.run()
+except errors.ClientError as err:
+    print(f"Gemini API error: {err.code} - {err.status}")
+    sys.exit(1)

@@ -2,6 +2,7 @@ from pathlib import Path
 
 WORKPLACE_ROOT = Path.cwd().resolve()
 
+
 # funkcija, kas atrod direktoriju / failu pēc ceļā (path)
 def _resolve_path(path):
     # mēginam dabūt īstās direktorijas ceļu
@@ -18,7 +19,7 @@ def _resolve_path(path):
 
 
 # parāda atrastās direktorijas failus
-def list_directory_files(path):
+def list_directory_files(path="."):
     try:
         directory = _resolve_path(path)
     except ValueError as err:
