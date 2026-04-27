@@ -5,11 +5,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-from tools import list_directory_files
-
-
-def get_weather(city):
-    return {"city": city, "temperature": 17}
+from zigmunds_ai.tools import list_directory_files
 
 
 load_dotenv()
@@ -28,42 +24,6 @@ system_instruction = """
         You are heplful though, and do what is asked of you as a senior developer.
         You reply ONLY Latvian.
         """
-
-get_weather_tool = types.Tool(
-    function_declarations=[
-        types.FunctionDeclaration(
-            name="get_weather",
-            description="Fetches weather data for a city",
-            parameters=types.Schema(
-                type=types.Type.OBJECT,
-                properties={"city": types.Schema(type=types.Type.STRING)},
-                required=["city"],
-            ),
-        )
-    ]
-)
-
-list_directory_files_tool = types.Tool(
-    function_declarations=[
-        types.FunctionDeclaration(
-            name="list_directory_files",
-            description="Fetches list of items in path (must be in current workplace directory)",
-            parameters=types.Schema(
-                type=types.Type.OBJECT,
-                properties={"path": types.Schema(type=types.Type.STRING)},
-                required=["path"],
-            ),
-        )
-    ]
-)
-
-
-TOOLS = [get_weather_tool, list_directory_files_tool]
-
-TOOL_REGISTRY = {
-    "get_weather": get_weather,
-    "list_directory_files": list_directory_files,
-}
 
 config = types.GenerateContentConfig(system_instruction=system_instruction, tools=TOOLS)
 
