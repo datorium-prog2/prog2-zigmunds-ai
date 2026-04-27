@@ -35,3 +35,12 @@ def list_directory_files(path="."):
         entries.append(f"{kind}: {relative}")
 
     return "\n".join(entries) if entries else "empty directory."
+
+
+def read_file(path):
+    target = _resolve_path(path)
+
+    if not target.is_file():
+        return f"Not a file: {path}"
+
+    return target.read_text(encoding="utf-8")
