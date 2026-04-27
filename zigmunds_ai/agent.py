@@ -19,6 +19,7 @@ class AgentSession:
             system_instruction=AgentSession.SYSTEM_INSTRUCTIONS, tools=TOOLS
         )
         self.model = model
+
         self.running = False
         self.history = []
         self.user_turn = True
